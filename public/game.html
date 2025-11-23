@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Détails du jeu</title>
+</head>
+<body>
+  <h1 id="titreJeu">Chargement...</h1>
+
+  <div id="details"></div>
+
+  <h2>Modifier ce jeu</h2>
+  <form id="editForm">
+    <input id="titre" placeholder="Titre"><br>
+    <input id="genre" placeholder="Genres"><br>
+    <input id="plateforme" placeholder="Plateformes"><br>
+    <input id="editeur" placeholder="Éditeur"><br>
+    <input id="developpeur" placeholder="Développeur"><br>
+    <input id="annee_sortie" type="number" placeholder="Année"><br>
+    <input id="metacritic_score" type="number" placeholder="Metacritic"><br>
+    <input id="temps_jeu_heures" type="number" placeholder="Durée"><br>
+
+    <label>
+      Terminé ? <input id="termine" type="checkbox">
+    </label><br>
+
+    <button type="submit">Sauvegarder</button>
+  </form>
+
+  <button id="deleteBtn" style="margin-top:20px;color:red;">Supprimer ce jeu</button>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    async function loadGame() {
+      const res = await fetch(`/api/games/${id}`);
+      const game = await res.json();
+
+      document.getElementById("titreJeu").textContent = game.titre;
+      document.getElementById("details").innerHTML = `
+        <p><strong>Genre :</strong> ${game.genre.join(", ")}</p>
+        <p><strong>Plateformes :</strong> ${game.plateforme.join(", ")}</p>
+        <p><strong>Éditeur :</strong> ${game.editeur}</p>
+        <p><strong>Développeur :</strong> ${game.developpeur}</p>
+        <p><strong>Année :</strong> ${game.annee_sortie || "-"}</p>
+        <p><strong>Metacritic :</strong> ${game.metacritic_score || "-"}</p>
+        <p><strong>Durée :</strong> ${game.temps_jeu_heures || "-"} heures</p>
+        <p><strong>Terminé :</strong> ${game.termine ? "Oui" : "Non"}</p>
+      `;
+
+      // Pré-remplir le formulaire
+      document.getElementById("titre").value = game.titre;
+      document.getElementById("genre").value = game.genre.join(", ");
+      document.getElementById("plateforme").value = game.plateforme.join(", ");
+      document.getElementById("editeur").value = game.editeur;
+      document.getElementById("developpeur").value = game.developpeur;
+      document.getElementById("annee_sortie").value = game.annee_sortie;
+      document.getElementById("metacritic_score").value = game.metacritic_score;
+      document.getElementById("temps_jeu_heures").value = game.temps_jeu_heures;
+      document.getElementById("termine").checked = game.termine;
+    }
+
+    // --- UPDATE ---
+    document.getElementById("editForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const body = {
+        titre: document.getElementById('titre').value,
+        genre: document.getElementById('genre').value,
+        plateforme: document.getElementById('plateforme').value,
+        editeur: document.getElementById('editeur').value,
+        developpeur: document.getElementById('developpeur').value,
+        annee_sortie: document.getElementById('annee_sortie').value,
+        metacritic_score: document.getElementById('metacritic_score').value,
+        temps_jeu_heures: document.getElementById('temps_jeu_heures').value,
+        termine: document.getElementById('termine').checked
+      };
+
+      const res = await fetch(`/api/games/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        alert("Modifications sauvegardées !");
+        loadGame();
+      } else {
+        alert("Erreur lors de la sauvegarde.");
+      }
+    });
+
+    // --- DELETE ---
+    document.getElementById("deleteBtn").addEventListener("click", async () => {
+      if (!confirm("Supprimer ce jeu ?")) return;
+
+      const res = await fetch(`/api/games/${id}`, { method: "DELETE" });
+
+      if (res.ok) {
+        alert("Jeu supprimé !");
+        window.location.href = "/";
+      } else {
+        alert("Erreur lors de la suppression.");
+      }
+    });
+
+    loadGame();
+  </script>
+</body>
+</html>

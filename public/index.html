@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Collection de Jeux</title>
+</head>
+
+<body>
+    <h1>Ma collection</h1>
+
+    <form id="gameForm">
+        <input id="titre" name="titre" placeholder="Titre" required><br>
+
+        <input id="genre" name="genre" placeholder="Genres (séparés par ,)"><br>
+        <input id="plateforme" name="plateforme" placeholder="Plateformes (séparées par ,)"><br>
+
+        <input id="editeur" name="editeur" placeholder="Éditeur"><br>
+        <input id="developpeur" name="developpeur" placeholder="Développeur"><br>
+
+        <input id="annee_sortie" name="annee_sortie" placeholder="Année" type="number"><br>
+        <input id="metacritic_score" name="metacritic_score" placeholder="Metacritic" type="number"><br>
+        <input id="temps_jeu_heures" name="temps_jeu_heures" placeholder="Temps de jeu" type="number"><br>
+
+        <label>
+            Terminé?
+            <input id="termine" name="termine" type="checkbox">
+        </label>
+
+        <button type="submit">Ajouter</button>
+    </form>
+
+    <h2>Filtres</h2>
+
+    <label>Genre :
+        <input id="filterGenre" placeholder="RPG, Action, etc">
+    </label>
+
+    <label>Plateforme :
+        <input id="filterPlateforme" placeholder="PC, PS5, etc">
+    </label>
+
+    <button id="applyFilters">Filtrer</button>
+    <button id="clearFilters">Réinitialiser</button>
+
+
+    <h2>Liste</h2>
+    <ul id="gameList"></ul>
+
+    <script>
+        async function loadGames(filters = {}) {
+            let url = '/api/games';
+
+            const params = new URLSearchParams();
+
+            if (filters.genre) params.append("genre", filters.genre);
+            if (filters.plateforme) params.append("plateforme", filters.plateforme);
+
+            if ([...params].length > 0) {
+                url += "?" + params.toString();
+            }
+
+            const res = await fetch(url);
+            const games = await res.json();
+
+            const ul = document.getElementById('gameList');
+            ul.innerHTML = '';
+            games.forEach(g => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="game.html?id=${g._id}">${g.titre}</a>`;
+                ul.appendChild(li);
+            });
+        }
+
+        document.getElementById("applyFilters").addEventListener("click", () => {
+            const genre = document.getElementById("filterGenre").value.trim();
+            const plateforme = document.getElementById("filterPlateforme").value.trim();
+
+            loadGames({
+                genre: genre || null,
+                plateforme: plateforme || null
+            });
+        });
+
+        document.getElementById("clearFilters").addEventListener("click", () => {
+            document.getElementById("filterGenre").value = "";
+            document.getElementById("filterPlateforme").value = "";
+            loadGames();
+        });
+
+
+
+        document.getElementById('gameForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const body = {
+                titre: document.getElementById('titre').value,
+                genre: document.getElementById('genre').value,
+                plateforme: document.getElementById('plateforme').value,
+                editeur: document.getElementById('editeur').value,
+                developpeur: document.getElementById('developpeur').value,
+                annee_sortie: document.getElementById('annee_sortie').value,
+                metacritic_score: document.getElementById('metacritic_score').value,
+                temps_jeu_heures: document.getElementById('temps_jeu_heures').value,
+                termine: document.getElementById('termine').checked
+            };
+
+            const res = await fetch('/api/games', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            if (res.ok) {
+                const created = await res.json();
+                console.log('Créé:', created);
+                // reset du formulaire
+                e.target.reset();
+                loadGames();
+            } else {
+                const err = await res.json();
+                alert('Erreur: ' + (err.error || JSON.stringify(err)));
+            }
+        });
+
+        loadGames();
+    </script>
+</body>
+
+</html>
