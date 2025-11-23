@@ -37,6 +37,10 @@
 
     <h2>Filtres</h2>
 
+    <label>Rechercher :
+        <input id="searchInput" placeholder="Titre du jeu...">
+    </label>
+
     <label>Genre :
         <input id="filterGenre" placeholder="RPG, Action, etc">
     </label>
@@ -53,6 +57,8 @@
     <ul id="gameList"></ul>
 
     <script>
+        let allGames = []; // on garde tous les jeux pour filtrage côté client
+
         async function loadGames(filters = {}) {
             let url = '/api/games';
 
@@ -66,8 +72,12 @@
             }
 
             const res = await fetch(url);
-            const games = await res.json();
+            allGames = await res.json(); // stocke la liste complète
 
+            renderGameList(allGames);
+        }
+
+        function renderGameList(games) {
             const ul = document.getElementById('gameList');
             ul.innerHTML = '';
             games.forEach(g => {
@@ -172,6 +182,13 @@
                 const err = await res.json();
                 alert('Erreur: ' + (err.error || JSON.stringify(err)));
             }
+        });
+
+        // Recherche dynamique
+        document.getElementById('searchInput').addEventListener('input', e => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allGames.filter(g => g.titre.toLowerCase().includes(term));
+            renderGameList(filtered);
         });
 
         loadGames();
