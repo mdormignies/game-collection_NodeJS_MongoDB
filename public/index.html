@@ -72,7 +72,42 @@
             ul.innerHTML = '';
             games.forEach(g => {
                 const li = document.createElement('li');
-                li.innerHTML = `<a href="game.html?id=${g._id}">${g.titre}</a>`;
+
+                // Créer le lien
+                const a = document.createElement('a');
+                a.href = `game.html?id=${g._id}`;
+                a.textContent = g.titre;
+                li.appendChild(a);
+
+                // Ajouter l'étoile si favori
+                const star = document.createElement('span');
+                star.textContent = g.favoris ? ' ⭐' : '';
+                li.appendChild(star);
+
+                // Bouton favori
+                const btn = document.createElement('button');
+                btn.style.marginLeft = "10px";
+                btn.textContent = g.favoris ? "💔 Retirer" : "❤️ Favori";
+                li.appendChild(btn);
+
+                // Événement pour basculer favori
+                btn.addEventListener("click", async () => {
+                    // Optimiste : inverser immédiatement l'état local
+                    g.favoris = !g.favoris;
+                    btn.textContent = g.favoris ? "💔 Retirer" : "❤️ Favori";
+                    star.textContent = g.favoris ? ' ⭐' : '';
+
+                    // Envoyer la requête au serveur
+                    const res = await fetch(`/api/games/${g._id}/favorite`, { method: "POST" });
+                    if (!res.ok) {
+                        alert("Erreur lors de la mise à jour du favori.");
+                        // rollback si erreur
+                        g.favoris = !g.favoris;
+                        btn.textContent = g.favoris ? "💔 Retirer" : "❤️ Favori";
+                        star.textContent = g.favoris ? ' ⭐' : '';
+                    }
+                });
+
                 ul.appendChild(li);
             });
         }
@@ -106,8 +141,6 @@
             document.getElementById("filterPlateforme").value = "";
             loadGames();
         });
-
-
 
         document.getElementById('gameForm').addEventListener('submit', async (e) => {
             e.preventDefault();

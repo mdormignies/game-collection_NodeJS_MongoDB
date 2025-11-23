@@ -178,7 +178,11 @@ exports.stats = async (req, res) => {
 
 exports.favorite = async (req, res) => {
   try {
-    const updated = await Game.updateGame(req.params.id, { favoris: true });
+    const game = await Game.getGameById(req.params.id);
+    if (!game) return res.status(404).json({ error: "Jeu introuvable" });
+
+    // Bascule la valeur de favoris
+    const updated = await Game.updateGame(req.params.id, { favoris: !game.favoris });
     res.json(updated);
   } catch (err) {
     console.error(err);
