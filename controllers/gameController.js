@@ -150,12 +150,29 @@ exports.deleteGame = async (req, res) => {
 exports.stats = async (req, res) => {
   try {
     const games = await Game.getAllGames();
-    const total = games.length;
-    const totalHeures = games.reduce((s, g) => s + (g.temps_jeu_heures || 0), 0);
-    res.json({ total_jeux: total, temps_total_heures: totalHeures });
+
+    const total_jeux = games.length;
+    const temps_total_heures = games.reduce((sum, g) => sum + (g.temps_jeu_heures || 0), 0);
+    const jeux_termines = games.filter(g => g.termine).length;
+
+    const metacritic_values = games
+      .map(g => g.metacritic_score)
+      .filter(n => typeof n === "number");
+
+    const metacritic_moyen = metacritic_values.length > 0
+      ? (metacritic_values.reduce((s, n) => s + n, 0) / metacritic_values.length).toFixed(1)
+      : 0;
+
+    res.json({
+      total_jeux,
+      temps_total_heures,
+      jeux_termines,
+      metacritic_moyen
+    });
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Erreur interne" });
+    res.status(500).json({ error: "Erreur lors du calcul des statistiques" });
   }
 };
 

@@ -30,6 +30,11 @@
         <button type="submit">Ajouter</button>
     </form>
 
+    <h2>Statistiques globales</h2>
+    <div id="stats">
+        Chargement...
+    </div>
+
     <h2>Filtres</h2>
 
     <label>Genre :
@@ -70,6 +75,20 @@
                 li.innerHTML = `<a href="game.html?id=${g._id}">${g.titre}</a>`;
                 ul.appendChild(li);
             });
+        }
+
+        async function loadStats() {
+            const res = await fetch("/api/games/stats");
+            const stats = await res.json();
+
+            const div = document.getElementById("stats");
+
+            div.innerHTML = `
+                <p><strong>Nombre total de jeux :</strong> ${stats.total_jeux}</p>
+                <p><strong>Temps de jeu total :</strong> ${stats.temps_total_heures} heures</p>
+                <p><strong>Nombre de jeux terminés :</strong> ${stats.jeux_termines}</p>
+                <p><strong>Metacritic moyen :</strong> ${stats.metacritic_moyen}</p>
+            `;
         }
 
         document.getElementById("applyFilters").addEventListener("click", () => {
@@ -123,6 +142,7 @@
         });
 
         loadGames();
+        loadStats();
     </script>
 </body>
 
