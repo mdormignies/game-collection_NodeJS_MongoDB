@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>Détails du jeu</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <h1 id="titreJeu">Chargement...</h1>
@@ -11,11 +12,11 @@
 
   <h2>Modifier ce jeu</h2>
   <form id="editForm">
-    <input id="titre" placeholder="Titre"><br>
-    <input id="genre" placeholder="Genres"><br>
-    <input id="plateforme" placeholder="Plateformes"><br>
-    <input id="editeur" placeholder="Éditeur"><br>
-    <input id="developpeur" placeholder="Développeur"><br>
+    <input id="titre" type="text" placeholder="Titre"><br>
+    <input id="genre" type="text" placeholder="Genres"><br>
+    <input id="plateforme" type="text" placeholder="Plateformes"><br>
+    <input id="editeur" type="text" placeholder="Éditeur"><br>
+    <input id="developpeur" type="text" placeholder="Développeur"><br>
     <input id="annee_sortie" type="number" placeholder="Année"><br>
     <input id="metacritic_score" type="number" placeholder="Metacritic"><br>
     <input id="temps_jeu_heures" type="number" placeholder="Durée"><br>
@@ -27,7 +28,7 @@
     <button type="submit">Sauvegarder</button>
   </form>
 
-  <button id="deleteBtn" style="margin-top:20px;color:red;">Supprimer ce jeu</button>
+  <button id="deleteBtn">Supprimer ce jeu</button>
 
   <script>
     const params = new URLSearchParams(window.location.search);

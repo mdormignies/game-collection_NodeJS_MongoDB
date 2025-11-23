@@ -4,19 +4,21 @@
 <head>
     <meta charset="utf-8" />
     <title>Collection de Jeux</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
     <h1>Ma collection</h1>
 
     <form id="gameForm">
-        <input id="titre" name="titre" placeholder="Titre" required><br>
+        <h2>Ajouter un jeu</h2>
+        <input id="titre" name="titre" placeholder="Titre" type="text" required><br>
 
-        <input id="genre" name="genre" placeholder="Genres (séparés par ,)"><br>
-        <input id="plateforme" name="plateforme" placeholder="Plateformes (séparées par ,)"><br>
+        <input id="genre" name="genre" placeholder="Genres (séparés par ,)" type="text" type="text"><br>
+        <input id="plateforme" name="plateforme" placeholder="Plateformes (séparées par ,)" type="text"><br>
 
-        <input id="editeur" name="editeur" placeholder="Éditeur"><br>
-        <input id="developpeur" name="developpeur" placeholder="Développeur"><br>
+        <input id="editeur" name="editeur" placeholder="Éditeur" type="text"><br>
+        <input id="developpeur" name="developpeur" placeholder="Développeur" type="text"><br>
 
         <input id="annee_sortie" name="annee_sortie" placeholder="Année" type="number"><br>
         <input id="metacritic_score" name="metacritic_score" placeholder="Metacritic" type="number"><br>
@@ -37,16 +39,12 @@
 
     <h2>Filtres</h2>
 
-    <label>Rechercher :
-        <input id="searchInput" placeholder="Titre du jeu...">
-    </label>
-
     <label>Genre :
-        <input id="filterGenre" placeholder="RPG, Action, etc">
+        <input id="filterGenre" placeholder="RPG, Action, etc" type="text">
     </label>
 
     <label>Plateforme :
-        <input id="filterPlateforme" placeholder="PC, PS5, etc">
+        <input id="filterPlateforme" placeholder="PC, PS5, etc" type="text">
     </label>
 
     <button id="applyFilters">Filtrer</button>
@@ -54,6 +52,9 @@
 
 
     <h2>Liste</h2>
+    <label>Rechercher :
+        <input id="searchInput" placeholder="Titre du jeu..." type="text">
+    </label>
     <button id="exportBtn">Exporter les données</button>
     <ul id="gameList"></ul>
 
@@ -92,21 +93,20 @@
 
                 // Ajouter l'étoile si favori
                 const star = document.createElement('span');
-                star.textContent = g.favoris ? ' ⭐' : '';
+                star.textContent = g.favoris ? '⭐' : '';
                 li.appendChild(star);
 
                 // Bouton favori
                 const btn = document.createElement('button');
-                btn.style.marginLeft = "10px";
-                btn.textContent = g.favoris ? "💔 Retirer" : "❤️ Favori";
+                btn.textContent = g.favoris ? "Retirer" : "Favori";
                 li.appendChild(btn);
 
                 // Événement pour basculer favori
                 btn.addEventListener("click", async () => {
                     // Optimiste : inverser immédiatement l'état local
                     g.favoris = !g.favoris;
-                    btn.textContent = g.favoris ? "💔 Retirer" : "❤️ Favori";
-                    star.textContent = g.favoris ? ' ⭐' : '';
+                    btn.textContent = g.favoris ? "Retirer" : "Favori";
+                    star.textContent = g.favoris ? '⭐' : '';
 
                     // Envoyer la requête au serveur
                     const res = await fetch(`/api/games/${g._id}/favorite`, { method: "POST" });
@@ -114,8 +114,8 @@
                         alert("Erreur lors de la mise à jour du favori.");
                         // rollback si erreur
                         g.favoris = !g.favoris;
-                        btn.textContent = g.favoris ? "💔 Retirer" : "❤️ Favori";
-                        star.textContent = g.favoris ? ' ⭐' : '';
+                        btn.textContent = g.favoris ? "Retirer" : "Favori";
+                        star.textContent = g.favoris ? '⭐' : '';
                     }
                 });
 
